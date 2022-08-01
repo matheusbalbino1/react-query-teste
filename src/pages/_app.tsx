@@ -1,6 +1,8 @@
 import { ChakraProvider } from "@chakra-ui/react"
 import { extendTheme, ThemeComponentProps } from "@chakra-ui/react"
 import { makeServer } from "../services/mirage"
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 
 
@@ -27,15 +29,20 @@ const theme = extendTheme({
 
 })
 
+const queryClient = new QueryClient()
+
 function MyApp({ Component, pageProps }) {
-  
+
   if (process.env.NODE_ENV === "development") {
     makeServer()
   }
   return (
-    <ChakraProvider theme={theme}>
-      <Component {...pageProps} />
-    </ChakraProvider>
+    <QueryClientProvider client={queryClient}>
+      <ChakraProvider theme={theme}>
+        <Component {...pageProps} />
+      </ChakraProvider>
+      <ReactQueryDevtools/>
+    </QueryClientProvider>
   )
 }
 

@@ -1,18 +1,16 @@
 
-import {
-  Flex,
-  ListItem,
-  Text, UnorderedList
-} from '@chakra-ui/react'
+import { Flex, ListItem, Spinner, Text, UnorderedList } from '@chakra-ui/react'
 import { useEffect } from 'react'
+import { useQuery } from "@tanstack/react-query"
+import { CircularProgress, CircularProgressLabel } from '@chakra-ui/react'
+import Link from 'next/link'
+import { api } from '../services/api'
+import { useUsers } from '../services/hooks/useUsers'
+
 
 export default function Home() {
 
-  useEffect(()=>{
-    fetch("http://localhost:3000/api/users")
-    .then(resposta => resposta.json())
-    .then(dados => console.log(dados))
-  },[])
+  const { isLoading, error, data } = useUsers()
 
   return (
     <Flex
@@ -21,16 +19,26 @@ export default function Home() {
       height="100vh"
       direction="column"
       width="100%">
-      <Flex direction="column">
+      <Link href="/dashboard"><a>Ir para DashBoard</a></Link>
+      <Flex direction="column" align={"center"} justify="center">
         <Text as="h1" mb={4} textTransform="uppercase">
+
           Lista para aprender <Text as="strong" color="pink">"React Query"</Text> com  Chakra-UI
         </Text>
-        <UnorderedList>
-          <ListItem>Lorem ipsum dolor sit amet</ListItem>
-          <ListItem>Consectetur adipiscing elit</ListItem>
-          <ListItem>Integer molestie lorem at massa</ListItem>
-          <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-        </UnorderedList>
+        {isLoading ? (
+          <Flex justify={"center"} align="center" mt="4">
+            <Spinner color="pink" size={"xl"} />
+          </Flex>)
+          : !error && !isLoading && (
+            <UnorderedList display={"flex"} flexWrap="wrap">
+              {data.map((user) => (<ListItem key={user.id} ml="10" w="50" bg="white" color="black" mt="10" p="4">
+                <Text>{user.name}</Text>
+                <Text>{user.email}</Text>
+                <Text>{user.createdAt}</Text>
+              </ListItem>)
+              )}
+            </UnorderedList>)}
+
       </Flex>
     </Flex>
   )
